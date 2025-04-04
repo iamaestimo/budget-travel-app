@@ -1,0 +1,232 @@
+<section class="bg-blue-600 text-white py-12">
+  <div class="container mx-auto px-4">
+    <h1 class="text-4xl font-bold text-center mb-2">
+      <i class="fas fa-search-plus mr-2"></i> Advanced Flight Search
+    </h1>
+    <h2 class="text-xl text-center text-blue-100">
+      Find the perfect flight with detailed search options
+    </h2>
+  </div>
+</section>
+
+<section class="py-8">
+  <div class="container mx-auto px-4">
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <%= form_with url: search_results_path, method: :post, class: "advanced-flight-search-form", data: { turbo: false } do |f| %>
+        <div class="mb-6 border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Route & Dates</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Origin -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="origin">From</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-plane-departure text-gray-500"></i>
+                  </div>
+                  <%= f.text_field :origin, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      placeholder: "SYD", 
+                      value: params[:origin] || "SYD", 
+                      maxlength: 3 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">Airport code (e.g., SYD)</p>
+              </div>
+            </div>
+            
+            <!-- Destination -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="destination">To</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-plane-arrival text-gray-500"></i>
+                  </div>
+                  <%= f.text_field :destination, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      placeholder: "BKK", 
+                      value: params[:destination] || "BKK", 
+                      maxlength: 3 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">Airport code (e.g., BKK)</p>
+              </div>
+            </div>
+            
+            <!-- Departure Date -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="departure_date">Departure Date</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-calendar text-gray-500"></i>
+                  </div>
+                  <%= f.date_field :departure_date, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      value: params[:departure_date] || (Date.today + 30.days).strftime("%Y-%m-%d"),
+                      min: Date.today.strftime("%Y-%m-%d") %>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Departure Time -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="departure_time">Preferred Time</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-clock text-gray-500"></i>
+                  </div>
+                  <%= f.time_field :departure_time, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      value: params[:departure_time] || "10:00" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6 border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Passengers & Cabin</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Adults -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="adults">Adults</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-user text-gray-500"></i>
+                  </div>
+                  <%= f.number_field :adults, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      min: 1, 
+                      max: 9, 
+                      value: params[:adults] || 1 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">12+ years</p>
+              </div>
+            </div>
+            
+            <!-- Children -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="children">Children</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-child text-gray-500"></i>
+                  </div>
+                  <%= f.number_field :children, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      min: 0, 
+                      max: 8, 
+                      value: params[:children] || 0 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">2-11 years</p>
+              </div>
+            </div>
+            
+            <!-- Infants -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="infants">Infants</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-baby text-gray-500"></i>
+                  </div>
+                  <%= f.number_field :infants, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      min: 0, 
+                      max: 4, 
+                      value: params[:infants] || 0 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">0-23 months</p>
+              </div>
+            </div>
+            
+            <!-- Cabin Class -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="cabin_class">Cabin Class</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-couch text-gray-500"></i>
+                  </div>
+                  <%= f.select :cabin_class, 
+                      [
+                        ['Economy', 'ECONOMY'], 
+                        ['Premium Economy', 'PREMIUM_ECONOMY'], 
+                        ['Business', 'BUSINESS'], 
+                        ['First Class', 'FIRST']
+                      ], 
+                      { selected: params[:cabin_class] || 'ECONOMY' }, 
+                      { class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white" } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6 border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Additional Options</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Currency -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="currency">Currency</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-money-bill-wave text-gray-500"></i>
+                  </div>
+                  <%= f.select :currency, 
+                      [['USD', 'USD'], ['EUR', 'EUR'], ['GBP', 'GBP'], ['AUD', 'AUD']], 
+                      { selected: params[:currency] || 'USD' }, 
+                      { class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white" } %>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Max Results -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="max_results">Max Results</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-list-ol text-gray-500"></i>
+                  </div>
+                  <%= f.number_field :max_results, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      min: 1, 
+                      max: 50, 
+                      value: params[:max_results] || 5 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">Number of flights to display</p>
+              </div>
+            </div>
+            
+            <!-- Non-stop Flights -->
+            <div>
+              <div class="mb-4 flex items-center">
+                <label class="block text-gray-700 font-bold" for="non_stop">
+                  <%= f.check_box :non_stop, 
+                      class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded", 
+                      checked: params[:non_stop] == "1" %>
+                  <span class="ml-2">Non-stop flights only</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-center">
+          <%= f.submit "Search Flights", 
+              class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition duration-200 text-lg" %>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="text-center">
+      <%= link_to root_path, class: "text-blue-600 hover:text-blue-800" do %>
+        <i class="fas fa-arrow-left mr-1"></i> Back to Basic Search
+      <% end %>
+    </div>
+  </div>
+</section>
