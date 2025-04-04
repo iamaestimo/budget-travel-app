@@ -1,0 +1,115 @@
+<div class="bg-white rounded-lg shadow-md p-6 mb-8">
+  <%= form_with url: root_path, method: :get, class: "flight-search-form" do |f| %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Origin -->
+      <div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="origin">From</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-plane-departure text-gray-500"></i>
+            </div>
+            <%= f.text_field :origin, 
+                class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                placeholder: "SYD", 
+                value: params[:origin] || "SYD", 
+                maxlength: 3 %>
+          </div>
+          <p class="text-gray-500 text-xs mt-1">Airport code (e.g., SYD)</p>
+        </div>
+      </div>
+      
+      <!-- Destination -->
+      <div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="destination">To</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-plane-arrival text-gray-500"></i>
+            </div>
+            <%= f.text_field :destination, 
+                class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                placeholder: "BKK", 
+                value: params[:destination] || "BKK", 
+                maxlength: 3 %>
+          </div>
+          <p class="text-gray-500 text-xs mt-1">Airport code (e.g., BKK)</p>
+        </div>
+      </div>
+      
+      <!-- Departure Date -->
+      <div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="departure_date">Departure Date</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-calendar text-gray-500"></i>
+            </div>
+            <%= f.date_field :departure_date, 
+                class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                value: params[:departure_date] || (Date.today + 30.days).strftime("%Y-%m-%d"),
+                min: Date.today.strftime("%Y-%m-%d") %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Passengers -->
+      <div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="adults">Passengers</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-user text-gray-500"></i>
+            </div>
+            <%= f.number_field :adults, 
+                class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                min: 1, 
+                max: 9, 
+                value: params[:adults] || 1 %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Price Range -->
+      <div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="max_price">Max Price</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-dollar-sign text-gray-500"></i>
+            </div>
+            <%= f.number_field :max_price, 
+                class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                min: 100, 
+                step: 100, 
+                value: params[:max_price] || 1000 %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Currency -->
+      <div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="currency">Currency</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <i class="fas fa-money-bill-wave text-gray-500"></i>
+            </div>
+            <%= f.select :currency, 
+                [['USD', 'USD'], ['EUR', 'EUR'], ['GBP', 'GBP'], ['AUD', 'AUD']], 
+                { selected: params[:currency] || 'USD' }, 
+                { class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white" } %>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Submit Button -->
+      <div class="flex items-end">
+        <div class="w-full mb-4">
+          <%= f.submit "Search Flights", 
+              class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition duration-200" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,157 @@
+<section class="bg-blue-600 text-white py-12">
+  <div class="container mx-auto px-4">
+    <h1 class="text-4xl font-bold text-center mb-2">
+      <i class="fas fa-globe mr-2"></i> Budget Flights Finder
+    </h1>
+    <h2 class="text-xl text-center text-blue-100">
+      Find the best flight deals
+    </h2>
+  </div>
+</section>
+
+<section class="py-8">
+  <div class="container mx-auto px-4">
+    <!-- Search Form -->
+    <%#= render 'search_form' %>
+    
+    <!-- Results Header -->
+    <h2 class="text-2xl font-bold text-center mb-8">
+      <% if @flights.any? %>
+        <span class="inline-flex items-center">
+          <i class="fas fa-plane mr-2"></i>
+          <span>Available Flights (<%= @flights.count %>)</span>
+        </span>
+      <% else %>
+        <span class="inline-flex items-center">
+          <i class="fas fa-search mr-2"></i>
+          <span>Search Results</span>
+        </span>
+      <% end %>
+    </h2>
+    
+    <% if @flights.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @flights.each do |flight| %>
+          <div class="flight-card-highlight">
+            <div class="bg-white rounded-lg shadow-md overflow-hidden mb-4">
+              <!-- Card Header -->
+              <div class="bg-blue-600 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center">
+                  <i class="fas fa-plane mr-2"></i>
+                  <strong><%= flight[:departure] %> → <%= flight[:arrival] %></strong>
+                </div>
+                
+                <% if flight[:stops] && flight[:stops] > 0 %>
+                  <span class="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">
+                    <%= flight[:stops] %> stop<%= flight[:stops] > 1 ? 's' : '' %>
+                  </span>
+                <% else %>
+                  <span class="bg-green-500 text-white text-xs px-2 py-1 rounded-full">Direct</span>
+                <% end %>
+              </div>
+              
+              <!-- Card Content -->
+              <div class="p-4">
+                <div class="flex justify-between items-center mb-4">
+                  <div class="flex">
+                    <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded-l-md"><%= flight[:airline] %></span>
+                    <span class="bg-blue-500 text-white text-xs px-2 py-1 rounded-r-md"><%= flight[:flight_number] %></span>
+                  </div>
+                  <div>
+                    <p class="text-blue-600 font-bold text-xl"><%= flight[:price] %> <%= flight[:currency] %></p>
+                  </div>
+                </div>
+                
+                <!-- Flight Times -->
+                <div class="flex items-center justify-between mb-4">
+                  <!-- Departure -->
+                  <div class="text-center">
+                    <p class="text-gray-500 text-xs">Departure</p>
+                    <p class="text-lg font-medium">
+                      <% if flight[:departure_time].present? %>
+                        <%= DateTime.parse(flight[:departure_time]).strftime("%H:%M") %>
+                      <% else %>
+                        N/A
+                      <% end %>
+                    </p>
+                    <p class="text-xs text-gray-500">
+                      <% if flight[:departure_time].present? %>
+                        <%= DateTime.parse(flight[:departure_time]).strftime("%b %d, %Y") %>
+                      <% else %>
+                        N/A
+                      <% end %>
+                    </p>
+                  </div>
+                  
+                  <!-- Flight Path -->
+                  <div class="flex-1 px-4 flex flex-col items-center">
+                    <div class="relative w-full flex items-center justify-center">
+                      <div class="h-0.5 w-full bg-gray-200 border-dashed border-t border-gray-300"></div>
+                      <div class="absolute">
+                        <i class="fas fa-plane text-blue-500"></i>
+                      </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">
+                      <% if flight[:duration].present? %>
+                        Duration: <%= flight[:duration].gsub('PT', '').gsub('H', 'h ').gsub('M', 'm') %>
+                      <% else %>
+                        Duration: N/A
+                      <% end %>
+                    </p>
+                  </div>
+                  
+                  <!-- Arrival -->
+                  <div class="text-center">
+                    <p class="text-gray-500 text-xs">Arrival</p>
+                    <p class="text-lg font-medium">
+                      <% if flight[:arrival_time].present? %>
+                        <%= DateTime.parse(flight[:arrival_time]).strftime("%H:%M") %>
+                      <% else %>
+                        N/A
+                      <% end %>
+                    </p>
+                    <p class="text-xs text-gray-500">
+                      <% if flight[:arrival_time].present? %>
+                        <%= DateTime.parse(flight[:arrival_time]).strftime("%b %d, %Y") %>
+                      <% else %>
+                        N/A
+                      <% end %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Card Footer -->
+              <div class="border-t border-gray-200 flex">
+                <a href="#" class="flex-1 p-3 text-center text-gray-700 hover:bg-gray-100 transition duration-150">
+                  <i class="fas fa-info-circle mr-1"></i> Details
+                </a>
+                <a href="#" class="flex-1 p-3 text-center text-blue-600 font-bold bg-blue-50 hover:bg-blue-100 transition duration-150">
+                  <i class="fas fa-shopping-cart mr-1"></i> Book Now
+                </a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% elsif @error.present? %>
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 relative rounded-md">
+        <button class="absolute top-0 right-0 mt-2 mr-2 text-red-700">&times;</button>
+        <div class="flex items-center">
+          <i class="fas fa-exclamation-circle mr-3 text-red-500 text-xl"></i>
+          <div>
+            <p class="font-bold">Error</p>
+            <p><%= @error %></p>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-6 rounded-md">
+        <div class="flex justify-center items-center">
+          <i class="fas fa-exclamation-triangle text-2xl text-yellow-600 mr-3"></i>
+          <span>No flights found. Try adjusting your search criteria.</span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
