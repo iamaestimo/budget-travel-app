@@ -12,6 +12,8 @@ class AmadeusHotelService
   # Step 3: Complete booking (Hotel Booking API) - future implementation
   HOTEL_BOOKING_URL = "https://test.api.amadeus.com/v1/booking/hotel-bookings".freeze
 
+  MAX_HOTELS_PER_REQUEST = 25 # Amadeus limit
+
   def initialize(access_token = nil)
     @access_token = access_token || AmadeusAuthService.new.call
   end
@@ -65,33 +67,44 @@ class AmadeusHotelService
   def search_hotel_offers(params)
     return [] unless @access_token
 
-    query_params = build_hotel_search_params(params)
-    headers = {
-      "Authorization" => "Bearer #{@access_token}",
-      "Accept" => "application/json"
-    }
+    # Get list of hotel IDs
+    hotel_ids = hotels_by_city(params[:city_code])&.map { |h| h[:id] }
+    return [] if hotel_ids.blank?
 
-    # Add debug logging
-    Rails.logger.debug "Hotel Offers API Request - URL: #{HOTEL_SEARCH_URL}"
-    Rails.logger.debug "Hotel Offers API Request - Params: #{query_params.inspect}"
-    Rails.logger.debug "Hotel Offers API Request - Headers: #{headers.inspect}"
+    # Split hotel IDs into batches
+    hotel_batches = hotel_ids.each_slice(MAX_HOTELS_PER_REQUEST).to_a
+    all_offers = []
 
-    begin
-      response = HTTP.headers(headers).get(HOTEL_SEARCH_URL, params: query_params)
+    hotel_batches.each do |batch_ids|
+      query_params = build_hotel_search_params(params.merge(hotel_ids: batch_ids))
+      headers = {
+        "Authorization" => "Bearer #{@access_token}",
+        "Accept" => "application/json"
+      }
 
-      Rails.logger.debug "Hotel Offers API Response - Status: #{response.status}"
-      Rails.logger.debug "Hotel Offers API Response - Body: #{response.body}"
+      Rails.logger.debug "Hotel Offers API Request - Batch Size: #{batch_ids.size}"
+      Rails.logger.debug "Hotel Offers API Request - URL: #{HOTEL_SEARCH_URL}"
+      Rails.logger.debug "Hotel Offers API Request - Params: #{query_params.inspect}"
+      Rails.logger.debug "Hotel Offers API Request - Headers: #{headers.inspect}"
 
-      if response.status.success?
-        parse_hotel_offers_response(response)
-      else
-        Rails.logger.error "Hotel Offers API Error: #{response.body}"
-        []
+      begin
+        response = HTTP.headers(headers).get(HOTEL_SEARCH_URL, params: query_params)
+
+        Rails.logger.debug "Hotel Offers API Response - Status: #{response.status}"
+        Rails.logger.debug "Hotel Offers API Response - Body: #{response.body}"
+
+        if response.status.success?
+          offers = parse_hotel_offers_response(response)
+          all_offers.concat(offers) if offers.present?
+        else
+          Rails.logger.error "Hotel Offers API Error: #{response.body}"
+        end
+      rescue => e
+        Rails.logger.error "Hotel Offers API Error: #{e.message}"
       end
-    rescue => e
-      Rails.logger.error "Hotel Offers API Error: #{e.message}"
-      []
     end
+
+    all_offers
   end
 
   private
@@ -217,7 +230,7 @@ class AmadeusHotelService
     end
 
     query_params = {
-      hotelIds: params[:hotel_ids],
+      hotelIds: Array(params[:hotel_ids]).join(","),
       checkInDate: check_in_date,
       checkOutDate: check_out_date,
       currency: params[:currency].presence || "USD",
