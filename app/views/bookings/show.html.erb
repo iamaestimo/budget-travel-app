@@ -1,0 +1,134 @@
+<section class="bg-green-600 text-white py-8">
+  <div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold text-center mb-2">
+      <i class="fas fa-check-circle mr-2"></i> Booking Confirmed
+    </h1>
+    <p class="text-center text-green-100">
+      Your booking reference is: <span class="font-bold"><%= @booking.booking_reference %></span>
+    </p>
+  </div>
+</section>
+
+<section class="py-8">
+  <div class="container mx-auto px-4">
+    <!-- Success Message -->
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-info-circle text-green-500"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm">
+            A confirmation email has been sent to <span class="font-medium"><%= @booking.email %></span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking Details Card -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+      <div class="bg-blue-600 text-white p-4">
+        <h2 class="text-xl font-bold">Booking Details</h2>
+      </div>
+      
+      <div class="p-6">
+        <div class="mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Passenger Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-gray-600 text-sm">Name</p>
+              <p class="font-medium"><%= @booking.first_name %> <%= @booking.last_name %></p>
+            </div>
+            
+            <div>
+              <p class="text-gray-600 text-sm">Email</p>
+              <p class="font-medium"><%= @booking.email %></p>
+            </div>
+          </div>
+        </div>
+        
+        <% if @booking.flight_details.present? %>
+          <div class="border-t border-gray-200 pt-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Flight Information</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <p class="text-gray-600 text-sm">Route</p>
+                <p class="font-medium">
+                  <%= @booking.flight_details["departure"] %> → <%= @booking.flight_details["arrival"] %>
+                </p>
+              </div>
+              
+              <div>
+                <p class="text-gray-600 text-sm">Date & Time</p>
+                <p class="font-medium">
+                  <% if @booking.flight_details["departure_time"].present? %>
+                    <%= DateTime.parse(@booking.flight_details["departure_time"]).strftime("%b %d, %Y %H:%M") %>
+                  <% else %>
+                    N/A
+                  <% end %>
+                </p>
+              </div>
+              
+              <div>
+                <p class="text-gray-600 text-sm">Flight</p>
+                <p class="font-medium">
+                  <%= @booking.flight_details["airline"] %> <%= @booking.flight_details["flight_number"] %>
+                </p>
+              </div>
+              
+              <div>
+                <p class="text-gray-600 text-sm">Status</p>
+                <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                  <%= @booking.status.capitalize %>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <div class="border-t border-gray-200 pt-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Payment Information</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+              <p class="text-gray-600 text-sm">Total Amount</p>
+              <p class="font-medium text-xl">
+                <%= @booking.amount || (@booking.flight_details&.dig("price") || "N/A") %>
+                <%= @booking.currency || (@booking.flight_details&.dig("currency") || "USD") %>
+              </p>
+            </div>
+            
+            <div>
+              <p class="text-gray-600 text-sm">Payment Method</p>
+              <p class="font-medium">Credit Card</p>
+            </div>
+            
+            <div>
+              <p class="text-gray-600 text-sm">Payment Status</p>
+              <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                Completed
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-gray-50 p-4 flex justify-between">
+        <%= link_to edit_booking_path(@booking), class: "text-blue-600 hover:text-blue-800" do %>
+          <i class="fas fa-edit mr-1"></i> Modify Booking
+        <% end %>
+        
+        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md" onclick="window.print()">
+          <i class="fas fa-print mr-1"></i> Print Confirmation
+        </button>
+      </div>
+    </div>
+    
+    <div class="text-center">
+      <%= link_to root_path, class: "text-blue-600 hover:text-blue-800" do %>
+        <i class="fas fa-search mr-1"></i> Search New Flights
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -29,8 +29,7 @@ class HomeController < ApplicationController
       originLocationCode: params[:origin].presence || "SYD",
       destinationLocationCode: params[:destination].presence || "BKK",
       departureDate: departure_date,
-      adults: params[:adults].presence || 1,
-      max: 5  # Limit results
+      adults: params[:adults].presence || 1
     }
 
     # Add optional parameters if present
@@ -150,10 +149,10 @@ class HomeController < ApplicationController
 
     if data["data"]
       data["data"].map do |flight|
-        # Guard against nil segments
         segments = flight.dig("itineraries", 0, "segments") || []
 
         {
+          id: flight["id"],
           price: flight.dig("price", "grandTotal") || "N/A",
           currency: flight.dig("price", "currency") || "USD",
           departure: flight.dig("itineraries", 0, "segments", 0, "departure", "iataCode"),

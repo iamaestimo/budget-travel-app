@@ -180,9 +180,10 @@
                 <a href="#" class="flex-1 p-3 text-center text-gray-700 hover:bg-gray-100 transition duration-150">
                   <i class="fas fa-info-circle mr-1"></i> Fare Details
                 </a>
-                <a href="#" class="flex-1 p-3 text-center text-blue-600 font-bold bg-blue-50 hover:bg-blue-100 transition duration-150">
+                <%= link_to new_booking_path(flight_id: flight[:id], flight_details: flight.to_json), 
+                    class: "flex-1 p-3 text-center text-blue-600 font-bold bg-blue-50 hover:bg-blue-100 transition duration-150" do %>
                   <i class="fas fa-shopping-cart mr-1"></i> Book Now
-                </a>
+                <% end %>
               </div>
             </div>
           </div>

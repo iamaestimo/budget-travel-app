@@ -1,0 +1,133 @@
+<section class="bg-blue-600 text-white py-8">
+  <div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold text-center mb-2">
+      <i class="fas fa-ticket-alt mr-2"></i> Book Your Flight
+    </h1>
+  </div>
+</section>
+
+<section class="py-8">
+  <div class="container mx-auto px-4">
+    <% if @flight_details.present? %>
+      <!-- Flight Summary Card -->
+      <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+          <div class="flex items-center">
+            <i class="fas fa-plane mr-2"></i>
+            <span class="font-bold"><%= @flight_details["departure"] %> → <%= @flight_details["arrival"] %></span>
+          </div>
+          <div class="font-bold text-xl">
+            <%= @flight_details["price"] %> <%= @flight_details["currency"] %>
+          </div>
+        </div>
+        
+        <div class="p-4 border-b border-gray-200">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-sm">Flight</span>
+              <span class="font-medium"><%= @flight_details["airline"] %> <%= @flight_details["flight_number"] %></span>
+            </div>
+            
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-sm">Departure</span>
+              <span class="font-medium">
+                <% if @flight_details["departure_time"].present? %>
+                  <%= DateTime.parse(@flight_details["departure_time"]).strftime("%b %d, %Y %H:%M") %>
+                <% else %>
+                  N/A
+                <% end %>
+              </span>
+            </div>
+            
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-sm">Duration</span>
+              <span class="font-medium">
+                <% if @flight_details["duration"].present? %>
+                  <%= @flight_details["duration"].gsub('PT', '').gsub('H', 'h ').gsub('M', 'm') %>
+                <% else %>
+                  N/A
+                <% end %>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    
+    <!-- Booking Form -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-bold mb-6">Passenger Information</h2>
+
+      <%# Price change details %>
+
+      <% if @price_changed %>
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-yellow-500"></i>
+            </div>
+            <div class="ml-3">
+              <p class="font-bold">Price Update</p>
+              <p>The price for this flight has changed since you selected it:</p>
+              <p class="mt-2">
+                <span class="line-through"><%= @original_flight_details["price"] %> <%= @original_flight_details["currency"] %></span>
+                <span class="font-bold ml-2"><%= @current_price %> <%= @flight_details["currency"] %></span>
+              </p>
+              <p class="mt-2 text-sm">Prices are subject to change based on availability.</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @error %>
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-circle text-red-500"></i>
+            </div>
+            <div class="ml-3">
+              <p class="font-bold">Error</p>
+              <p><%= @error %></p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      
+      <%= form_with model: @booking, url: bookings_path, local: true do |f| %>
+        <%= f.hidden_field :flight_id, value: @flight_id %>
+        <%= hidden_field_tag :flight_details, @flight_details.to_json if @flight_details.present? %>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <%= f.label :first_name, class: "block text-gray-700 text-sm font-bold mb-2" %>
+            <%= f.text_field :first_name, class: "w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", required: true %>
+          </div>
+          
+          <div>
+            <%= f.label :last_name, class: "block text-gray-700 text-sm font-bold mb-2" %>
+            <%= f.text_field :last_name, class: "w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", required: true %>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <%= f.label :email, class: "block text-gray-700 text-sm font-bold mb-2" %>
+          <%= f.email_field :email, class: "w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", required: true %>
+        </div>
+        
+        <div class="border-t border-gray-200 pt-6 mt-6">
+          <div class="flex items-center mb-4">
+            <input type="checkbox" id="terms" name="terms" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" required>
+            <label for="terms" class="ml-2 block text-sm text-gray-700">
+              I agree to the <a href="#" class="text-blue-600 hover:underline">terms and conditions</a>
+            </label>
+          </div>
+        </div>
+        
+        <div class="flex justify-between items-center">
+          <%= link_to "Back to Results", :back, class: "text-blue-600 hover:underline" %>
+          <%= f.submit "Continue to Payment", class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition duration-200" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
