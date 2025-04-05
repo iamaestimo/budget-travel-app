@@ -12,6 +12,50 @@ class HomeController < ApplicationController
     render :search_results
   end
 
+  # =========== Hotel Methods ===========
+
+  def hotel_search
+    # Display the hotel search form
+  end
+
+  def hotel_results
+    # Fetch and display hotel search results
+    access_token = AmadeusAuthService.new.call
+    @hotels = access_token ? search_hotels(access_token) : []
+    render :hotel_results
+  end
+
+  def hotel_details
+    # Fetch and display details for a specific hotel
+    access_token = AmadeusAuthService.new.call
+
+    hotel_id = params[:hotel_id]
+    offer_id = params[:offer_id]
+
+    if offer_id.present?
+      # Get details for a specific offer
+      service = AmadeusHotelService.new(access_token)
+      @hotel_offer = service.hotel_offer_details(offer_id)
+
+      if @hotel_offer.nil?
+        @error = "Could not find details for the selected offer."
+      end
+    elsif hotel_id.present?
+      # Get all offers for a specific hotel
+      service = AmadeusHotelService.new(access_token)
+      search_params = extract_hotel_search_params
+      @hotel_offers = service.hotel_offers_by_hotel(hotel_id, search_params)
+
+      if @hotel_offers.empty?
+        @error = "Could not find offers for the selected hotel."
+      end
+    else
+      @error = "Hotel ID or Offer ID is required."
+    end
+
+    render :hotel_details
+  end
+
   private
 
   def search_flights(access_token)
@@ -196,5 +240,86 @@ class HomeController < ApplicationController
     Rails.logger.error "Flight Search Error: #{e.message}"
     @error = "Error: #{e.message}"
     []
+  end
+
+  # =========== Hotel Helper Methods ===========
+
+  def search_hotels(access_token)
+    service = AmadeusHotelService.new(access_token)
+    search_params = extract_hotel_search_params
+
+    if search_params[:city_code].present?
+      # First get list of hotels in the city
+      hotels = service.hotels_by_city(search_params[:city_code])
+
+      if hotels.empty?
+        @error = "No hotels found in the specified city."
+        return []
+      end
+
+      # Extract hotel IDs and add them to search params
+      search_params[:hotel_ids] = hotels.map { |h| h[:id] }.join(",")
+
+      # Log the hotel IDs for debugging
+      Rails.logger.debug "Hotel IDs for offers search: #{search_params[:hotel_ids]}"
+
+      # Then get offers for these hotels
+      results = service.search_hotel_offers(search_params)
+
+      if results.empty?
+        @error = "No hotel offers found matching your criteria."
+      end
+
+      results
+    else
+      @error = "Please provide a city code to search for hotels."
+      []
+    end
+  rescue => e
+    Rails.logger.error "Hotel search error: #{e.message}"
+    @error = "An error occurred while searching for hotels."
+    []
+  end
+
+  def extract_hotel_search_params
+    {
+      city_code: params[:city_code].presence,
+      check_in_date: params[:check_in_date].presence,
+      check_out_date: params[:check_out_date].presence,
+      adults: params[:adults].presence,
+      rooms: params[:rooms].presence,
+      max_price: params[:max_price].presence,
+      currency: params[:currency].presence || "USD",
+      ratings: extract_hotel_ratings,
+      amenities: extract_hotel_amenities
+    }
+  end
+
+  def extract_hotel_ratings
+    return nil unless params[:ratings].present?
+
+    if params[:ratings].is_a?(Array)
+      params[:ratings]
+    elsif params[:ratings].is_a?(String) && params[:ratings].include?(",")
+      params[:ratings].split(",")
+    elsif params[:ratings].is_a?(String)
+      [ params[:ratings] ]
+    else
+      nil
+    end
+  end
+
+  def extract_hotel_amenities
+    return nil unless params[:amenities].present?
+
+    if params[:amenities].is_a?(Array)
+      params[:amenities]
+    elsif params[:amenities].is_a?(String) && params[:amenities].include?(",")
+      params[:amenities].split(",")
+    elsif params[:amenities].is_a?(String)
+      [ params[:amenities] ]
+    else
+      nil
+    end
   end
 end

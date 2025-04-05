@@ -1,0 +1,218 @@
+<section class="bg-blue-600 text-white py-12">
+  <div class="container mx-auto px-4">
+    <h1 class="text-4xl font-bold text-center mb-2">
+      <i class="fas fa-hotel mr-2"></i> Hotel Search
+    </h1>
+    <h2 class="text-xl text-center text-blue-100">
+      Find the perfect accommodations for your trip
+    </h2>
+  </div>
+</section>
+
+<section class="py-8">
+  <div class="container mx-auto px-4">
+    <!-- Hotel Search Form -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <%= form_with url: hotel_results_path, method: :get, class: "hotel-search-form" do |f| %>
+        <div class="mb-6 border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Location & Dates</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- City Code -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="city_code">City</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-map-marker-alt text-gray-500"></i>
+                  </div>
+                  <%= f.text_field :city_code, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      placeholder: "BKK", 
+                      value: params[:city_code] || "BKK", 
+                      maxlength: 3 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">City code (e.g., BKK, NYC)</p>
+              </div>
+            </div>
+            
+            <!-- Check-in Date -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="check_in_date">Check-in Date</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-calendar-check text-gray-500"></i>
+                  </div>
+                  <%= f.date_field :check_in_date, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      value: params[:check_in_date] || (Date.today + 7.days).strftime("%Y-%m-%d"),
+                      min: Date.today.strftime("%Y-%m-%d") %>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Check-out Date -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="check_out_date">Check-out Date</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-calendar-minus text-gray-500"></i>
+                  </div>
+                  <%= f.date_field :check_out_date, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      value: params[:check_out_date] || (Date.today + 10.days).strftime("%Y-%m-%d"),
+                      min: (Date.today + 1.day).strftime("%Y-%m-%d") %>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Currency -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="currency">Currency</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-money-bill-wave text-gray-500"></i>
+                  </div>
+                  <%= f.select :currency, 
+                      [['USD', 'USD'], ['EUR', 'EUR'], ['GBP', 'GBP'], ['AUD', 'AUD']], 
+                      { selected: params[:currency] || 'USD' }, 
+                      { class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white" } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6 border-b border-gray-200 pb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Rooms & Guests</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Number of Rooms -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="rooms">Rooms</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-door-open text-gray-500"></i>
+                  </div>
+                  <%= f.number_field :rooms, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      min: 1, 
+                      max: 9, 
+                      value: params[:rooms] || 1 %>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Adults -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="adults">Adults</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-user text-gray-500"></i>
+                  </div>
+                  <%= f.number_field :adults, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      min: 1, 
+                      max: 9, 
+                      value: params[:adults] || 2 %>
+                </div>
+                <p class="text-gray-500 text-xs mt-1">Per room</p>
+              </div>
+            </div>
+            
+            <!-- Max Price -->
+            <div>
+              <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="max_price">Max Price Per Night</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fas fa-dollar-sign text-gray-500"></i>
+                  </div>
+                  <%= f.number_field :max_price, 
+                      class: "w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500", 
+                      min: 50, 
+                      step: 50, 
+                      value: params[:max_price] || 300 %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">Preferences</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Hotel Ratings -->
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2">Hotel Rating</label>
+              
+              <div class="flex flex-wrap gap-2">
+                <% ["1", "2", "3", "4", "5"].each do |rating| %>
+                  <div class="flex items-center">
+                    <%= f.check_box "ratings[]", 
+                        { multiple: true, checked: params[:ratings]&.include?(rating), class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" }, 
+                        rating, 
+                        nil %>
+                    <label class="ml-2 text-gray-700">
+                      <% rating.to_i.times do %>
+                        <i class="fas fa-star text-yellow-400"></i>
+                      <% end %>
+                    </label>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            
+            <!-- Amenities -->
+            <div>
+              <label class="block text-gray-700 text-sm font-bold mb-2">Amenities</label>
+              
+              <div class="grid grid-cols-2 gap-2">
+                <% [
+                  ["SWIMMING_POOL", "Swimming Pool"],
+                  ["SPA", "Spa"],
+                  ["RESTAURANT", "Restaurant"],
+                  ["PARKING", "Parking"],
+                  ["PETS_ALLOWED", "Pets Allowed"],
+                  ["WIFI", "WiFi"],
+                  ["ROOM_SERVICE", "Room Service"],
+                  ["FITNESS_CENTER", "Fitness Center"]
+                ].each do |value, label| %>
+                  <div class="flex items-center">
+                    <%= f.check_box "amenities[]", 
+                        { multiple: true, checked: params[:amenities]&.include?(value), class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" }, 
+                        value, 
+                        nil %>
+                    <label class="ml-2 text-gray-700"><%= label %></label>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-center">
+          <%= f.submit "Search Hotels", 
+              class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition duration-200 text-lg" %>
+        </div>
+      <% end %>
+    </div>
+    
+    <!-- Return to home link -->
+    <div class="text-center">
+      <%= link_to root_path, class: "text-blue-600 hover:text-blue-800" do %>
+        <i class="fas fa-home mr-1"></i> Return to Home
+      <% end %>
+      <span class="mx-2 text-gray-300">|</span>
+      <%= link_to advanced_search_path, class: "text-blue-600 hover:text-blue-800" do %>
+        <i class="fas fa-plane mr-1"></i> Flight Search
+      <% end %>
+    </div>
+  </div>
+</section>

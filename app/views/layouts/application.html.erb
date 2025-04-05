@@ -24,8 +24,86 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <!-- Navigation Bar -->
+    <%= render 'layouts/navbar' %>
+
+    <!-- Main Content -->
+    <main class="mt-16">
       <%= yield %>
     </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- About Section -->
+          <div>
+            <h3 class="text-lg font-bold mb-4">Budget Travel App</h3>
+            <p class="text-gray-400 text-sm">
+              Find the best deals on flights, hotels, and more for your next adventure. 
+              We search across multiple providers to get you the best prices.
+            </p>
+          </div>
+          
+          <!-- Quick Links -->
+          <div>
+            <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <%= link_to root_path, class: "text-gray-400 hover:text-white" do %>
+                  <i class="fas fa-home mr-1"></i> Home
+                <% end %>
+              </li>
+              <li>
+                <%= link_to advanced_search_path, class: "text-gray-400 hover:text-white" do %>
+                  <i class="fas fa-plane mr-1"></i> Flight Search
+                <% end %>
+              </li>
+              <li>
+                <%= link_to hotel_search_path, class: "text-gray-400 hover:text-white" do %>
+                  <i class="fas fa-hotel mr-1"></i> Hotel Search
+                <% end %>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Legal Info -->
+          <div>
+            <h3 class="text-lg font-bold mb-4">Legal</h3>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white">Terms & Conditions</a>
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a>
+              </li>
+              <li>
+                <a href="#" class="text-gray-400 hover:text-white">Cookie Policy</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
+          <p>© <%= Date.today.year %> Budget Travel App. All rights reserved.</p>
+          <p class="mt-2">Powered by Amadeus API</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Mobile Menu JavaScript -->
+    <script>
+      document.addEventListener('turbo:load', function() {
+        // Mobile menu toggle
+        const menuButton = document.querySelector('.mobile-menu-button');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        
+        if (menuButton && mobileMenu) {
+          menuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+          });
+        }
+      });
+    </script>
   </body>
 </html>

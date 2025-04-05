@@ -1,0 +1,55 @@
+<nav class="bg-blue-700 text-white shadow-md w-full fixed top-0 left-0 z-10">
+  <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center py-3">
+      <!-- Logo and Site Name -->
+      <div class="flex items-center">
+        <a href="<%= root_path %>" class="flex items-center hover:text-blue-200">
+          <i class="fas fa-globe text-xl mr-2"></i>
+          <span class="font-bold text-xl">Budget Travel App</span>
+        </a>
+      </div>
+      
+      <!-- Main Navigation -->
+      <div class="hidden md:flex items-center space-x-4">
+        <!-- Flight Search Link -->
+        <%= link_to advanced_search_path, class: "py-2 px-3 text-white hover:bg-blue-600 rounded transition duration-150 flex items-center" do %>
+          <i class="fas fa-plane mr-1"></i> Flights
+        <% end %>
+        
+        <!-- Hotel Search Link -->
+        <%= link_to hotel_search_path, class: "py-2 px-3 text-white hover:bg-blue-600 rounded transition duration-150 flex items-center" do %>
+          <i class="fas fa-hotel mr-1"></i> Hotels
+        <% end %>
+        
+        <!-- Future: Car Rentals Link -->
+        <div class="py-2 px-3 text-blue-300 flex items-center cursor-not-allowed">
+          <i class="fas fa-car mr-1"></i> Cars
+          <span class="ml-1 text-xs bg-blue-500 px-1 rounded">Soon</span>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden">
+        <button type="button" class="mobile-menu-button p-2 rounded hover:bg-blue-600 focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu hidden md:hidden pb-3">
+      <%= link_to advanced_search_path, class: "block py-2 px-4 text-white hover:bg-blue-600 rounded mb-1" do %>
+        <i class="fas fa-plane mr-1"></i> Flight Search
+      <% end %>
+      
+      <%= link_to hotel_search_path, class: "block py-2 px-4 text-white hover:bg-blue-600 rounded mb-1" do %>
+        <i class="fas fa-hotel mr-1"></i> Hotel Search
+      <% end %>
+      
+      <div class="block py-2 px-4 text-blue-300 cursor-not-allowed">
+        <i class="fas fa-car mr-1"></i> Car Rentals
+        <span class="ml-1 text-xs bg-blue-500 px-1 rounded">Coming Soon</span>
+      </div>
+    </div>
+  </div>
+</nav>
