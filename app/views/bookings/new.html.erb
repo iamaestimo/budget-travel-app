@@ -9,6 +9,41 @@
 <section class="py-8">
   <div class="container mx-auto px-4">
     <% if @flight_details.present? %>
+      <!-- Price Change Alert -->
+      <% if @price_changed %>
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="font-bold">Price Update</p>
+              <p>The price for this flight has changed since you selected it:</p>
+              <p class="mt-2">
+                <span class="line-through"><%= @flight_details["original_price"] %> <%= @flight_details["currency"] %></span>
+                <span class="font-bold ml-2"><%= @flight_details["current_price"] %> <%= @flight_details["currency"] %></span>
+              </p>
+              <p class="mt-2 text-sm">Prices are subject to change based on availability.</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      
+      <!-- Error Alert -->
+      <% if @error.present? %>
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+            </div>
+            <div class="ml-3">
+              <p class="font-bold">Error</p>
+              <p><%= @error %></p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      
       <!-- Flight Summary Card -->
       <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
         <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
@@ -17,7 +52,7 @@
             <span class="font-bold"><%= @flight_details["departure"] %> → <%= @flight_details["arrival"] %></span>
           </div>
           <div class="font-bold text-xl">
-            <%= @flight_details["price"] %> <%= @flight_details["currency"] %>
+            <%= @price_changed ? @flight_details["current_price"] : @flight_details["price"] %> <%= @flight_details["currency"] %>
           </div>
         </div>
         
@@ -57,41 +92,6 @@
     <!-- Booking Form -->
     <div class="bg-white rounded-lg shadow-md p-6">
       <h2 class="text-xl font-bold mb-6">Passenger Information</h2>
-
-      <%# Price change details %>
-
-      <% if @price_changed %>
-        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-            </div>
-            <div class="ml-3">
-              <p class="font-bold">Price Update</p>
-              <p>The price for this flight has changed since you selected it:</p>
-              <p class="mt-2">
-                <span class="line-through"><%= @original_flight_details["price"] %> <%= @original_flight_details["currency"] %></span>
-                <span class="font-bold ml-2"><%= @current_price %> <%= @flight_details["currency"] %></span>
-              </p>
-              <p class="mt-2 text-sm">Prices are subject to change based on availability.</p>
-            </div>
-          </div>
-        </div>
-      <% end %>
-
-      <% if @error %>
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <i class="fas fa-exclamation-circle text-red-500"></i>
-            </div>
-            <div class="ml-3">
-              <p class="font-bold">Error</p>
-              <p><%= @error %></p>
-            </div>
-          </div>
-        </div>
-      <% end %>
       
       <%= form_with model: @booking, url: bookings_path, local: true do |f| %>
         <%= f.hidden_field :flight_id, value: @flight_id %>

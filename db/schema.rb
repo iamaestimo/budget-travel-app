@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_05_104324) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_05_200747) do
   create_table "bookings", force: :cascade do |t|
     t.string "first_name", null: false
     t.string "last_name", null: false
@@ -24,6 +24,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_104324) do
     t.string "currency", default: "USD"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "notes"
     t.index ["booking_reference"], name: "index_bookings_on_booking_reference", unique: true
     t.index ["flight_id"], name: "index_bookings_on_flight_id"
   end

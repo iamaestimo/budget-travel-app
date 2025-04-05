@@ -1,7 +1,15 @@
 <section class="bg-green-600 text-white py-8">
   <div class="container mx-auto px-4">
     <h1 class="text-3xl font-bold text-center mb-2">
-      <i class="fas fa-check-circle mr-2"></i> Booking Confirmed
+      <% if @booking.status == "confirmed" %>
+        <i class="fas fa-check-circle mr-2"></i> Booking Confirmed
+      <% elsif @booking.status == "price_changed" %>
+        <i class="fas fa-exclamation-circle mr-2"></i> Price Changed
+      <% elsif @booking.status == "fare_unavailable" %>
+        <i class="fas fa-exclamation-circle mr-2"></i> Fare Unavailable
+      <% else %>
+        <i class="fas fa-info-circle mr-2"></i> Booking Status: <%= @booking.status.titleize %>
+      <% end %>
     </h1>
     <p class="text-center text-green-100">
       Your booking reference is: <span class="font-bold"><%= @booking.booking_reference %></span>
@@ -11,19 +19,54 @@
 
 <section class="py-8">
   <div class="container mx-auto px-4">
-    <!-- Success Message -->
-    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
-      <div class="flex">
-        <div class="flex-shrink-0">
-          <i class="fas fa-info-circle text-green-500"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm">
-            A confirmation email has been sent to <span class="font-medium"><%= @booking.email %></span>
-          </p>
+    <!-- Status Messages -->
+    <% if @booking.status == "confirmed" %>
+      <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+          </div>
+          <div class="ml-3">
+            <p class="font-bold">Booking Confirmed</p>
+            <p class="text-sm">A confirmation email has been sent to <span class="font-medium"><%= @booking.email %></span></p>
+          </div>
         </div>
       </div>
-    </div>
+    <% elsif @booking.status == "price_changed" %>
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+          </div>
+          <div class="ml-3">
+            <p class="font-bold">Price Change Alert</p>
+            <p>The price of this flight has changed since you selected it. Please search again for the latest pricing.</p>
+            <div class="mt-3">
+              <%= link_to root_path, class: "bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md" do %>
+                <i class="fas fa-search mr-1"></i> Search Again
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% elsif @booking.status == "fare_unavailable" %>
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+          </div>
+          <div class="ml-3">
+            <p class="font-bold">Fare No Longer Available</p>
+            <p>The fare class you selected is no longer available. Please search again to see current options.</p>
+            <div class="mt-3">
+              <%= link_to root_path, class: "bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md" do %>
+                <i class="fas fa-search mr-1"></i> Search Again
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
 
     <!-- Booking Details Card -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
@@ -79,14 +122,112 @@
               
               <div>
                 <p class="text-gray-600 text-sm">Status</p>
-                <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                  <%= @booking.status.capitalize %>
-                </p>
+                <% if @booking.status == "confirmed" %>
+                  <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    Confirmed
+                  </p>
+                <% elsif @booking.status == "price_changed" %>
+                  <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                    Price Changed
+                  </p>
+                <% elsif @booking.status == "fare_unavailable" %>
+                  <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                    Fare Unavailable
+                  </p>
+                <% else %>
+                  <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                    <%= @booking.status.titleize %>
+                  </p>
+                <% end %>
               </div>
             </div>
+            
+            <!-- Price Information -->
+            <div class="mt-4">
+              <p class="text-gray-600 text-sm">Price</p>
+              <p class="font-medium text-xl">
+                <% if @booking.flight_details["current_price"].present? %>
+                  <%= @booking.flight_details["current_price"] %>
+                  <% if @booking.flight_details["original_price"] != @booking.flight_details["current_price"] %>
+                    <span class="text-sm text-gray-500 line-through ml-2"><%= @booking.flight_details["original_price"] %></span>
+                  <% end %>
+                <% else %>
+                  <%= @booking.flight_details["price"] %>
+                <% end %>
+                <%= @booking.flight_details["currency"] %>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Flight Segments -->
+          <div class="border-t border-gray-200 pt-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Flight Details</h3>
+            
+            <% @booking.flight_details["segments"].each_with_index do |segment, index| %>
+              <div class="<%= index > 0 ? 'mt-4 pt-4 border-t border-dashed border-gray-200' : '' %>">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                  <!-- Departure -->
+                  <div class="flex flex-col">
+                    <div class="flex items-center">
+                      <i class="fas fa-plane-departure text-blue-500 mr-2"></i>
+                      <span class="font-bold"><%= segment["departure_airport"] %></span>
+                      <% if segment["departure_terminal"].present? %>
+                        <span class="ml-1 text-xs bg-gray-200 px-1 rounded">Terminal <%= segment["departure_terminal"] %></span>
+                      <% end %>
+                    </div>
+                    <span class="text-lg mt-1">
+                      <%= DateTime.parse(segment["departure_time"]).strftime("%H:%M") %>
+                    </span>
+                    <span class="text-gray-500 text-sm">
+                      <%= DateTime.parse(segment["departure_time"]).strftime("%b %d, %Y") %>
+                    </span>
+                  </div>
+                  
+                  <!-- Flight Info -->
+                  <div class="flex flex-col items-center justify-center">
+                    <div class="relative w-full flex items-center justify-center">
+                      <div class="h-0.5 w-full bg-gray-200 border-dashed border-t border-gray-300"></div>
+                      <i class="fas fa-plane text-blue-500 absolute"></i>
+                    </div>
+                    <span class="text-xs text-gray-500 mt-2">
+                      <%= segment["carrier"] %> <%= segment["flight_number"] %>
+                    </span>
+                    <span class="text-xs text-gray-500">
+                      Duration: <%= segment["duration"].gsub('PT', '').gsub('H', 'h ').gsub('M', 'm') %>
+                    </span>
+                    <span class="text-xs text-gray-500">
+                      Aircraft: <%= segment["aircraft"] %>
+                    </span>
+                  </div>
+                  
+                  <!-- Arrival -->
+                  <div class="flex flex-col">
+                    <div class="flex items-center">
+                      <i class="fas fa-plane-arrival text-green-500 mr-2"></i>
+                      <span class="font-bold"><%= segment["arrival_airport"] %></span>
+                      <% if segment["arrival_terminal"].present? %>
+                        <span class="ml-1 text-xs bg-gray-200 px-1 rounded">Terminal <%= segment["arrival_terminal"] %></span>
+                      <% end %>
+                    </div>
+                    <span class="text-lg mt-1">
+                      <%= DateTime.parse(segment["arrival_time"]).strftime("%H:%M") %>
+                    </span>
+                    <span class="text-gray-500 text-sm">
+                      <%= DateTime.parse(segment["arrival_time"]).strftime("%b %d, %Y") %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="border-t border-gray-200 pt-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Flight Information</h3>
+            <p class="text-gray-600">Detailed flight information is not available.</p>
           </div>
         <% end %>
         
+        <!-- Payment Information -->
         <div class="border-t border-gray-200 pt-6">
           <h3 class="text-lg font-bold text-gray-800 mb-2">Payment Information</h3>
           
@@ -94,8 +235,17 @@
             <div>
               <p class="text-gray-600 text-sm">Total Amount</p>
               <p class="font-medium text-xl">
-                <%= @booking.amount || (@booking.flight_details&.dig("price") || "N/A") %>
-                <%= @booking.currency || (@booking.flight_details&.dig("currency") || "USD") %>
+                <% if @booking.flight_details.present? %>
+                  <% if @booking.flight_details["current_price"].present? %>
+                    <%= @booking.flight_details["current_price"] %>
+                  <% else %>
+                    <%= @booking.flight_details["price"] %>
+                  <% end %>
+                  <%= @booking.flight_details["currency"] %>
+                <% else %>
+                  <%= @booking.amount || "N/A" %>
+                  <%= @booking.currency || "USD" %>
+                <% end %>
               </p>
             </div>
             
@@ -106,26 +256,42 @@
             
             <div>
               <p class="text-gray-600 text-sm">Payment Status</p>
-              <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                Completed
-              </p>
+              <% if @booking.status == "confirmed" %>
+                <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                  Completed
+                </p>
+              <% elsif ["price_changed", "fare_unavailable"].include?(@booking.status) %>
+                <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                  Failed
+                </p>
+              <% else %>
+                <p class="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                  Pending
+                </p>
+              <% end %>
             </div>
           </div>
         </div>
       </div>
       
       <div class="bg-gray-50 p-4 flex justify-between">
-        <%= link_to edit_booking_path(@booking), class: "text-blue-600 hover:text-blue-800" do %>
-          <i class="fas fa-edit mr-1"></i> Modify Booking
+        <% if @booking.status == "confirmed" %>
+          <%= link_to edit_booking_path(@booking), class: "text-blue-600 hover:text-blue-800" do %>
+            <i class="fas fa-edit mr-1"></i> Modify Booking
+          <% end %>
+          
+          <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md" onclick="window.print()">
+            <i class="fas fa-print mr-1"></i> Print Confirmation
+          </button>
+        <% else %>
+          <%= link_to root_path, class: "text-blue-600 hover:text-blue-800" do %>
+            <i class="fas fa-search mr-1"></i> Search New Flights
+          <% end %>
         <% end %>
-        
-        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md" onclick="window.print()">
-          <i class="fas fa-print mr-1"></i> Print Confirmation
-        </button>
       </div>
     </div>
     
-    <div class="text-center">
+    <div class="text-center mt-6">
       <%= link_to root_path, class: "text-blue-600 hover:text-blue-800" do %>
         <i class="fas fa-search mr-1"></i> Search New Flights
       <% end %>
