@@ -1,0 +1,58 @@
+<div class="container py-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-center mb-2">Multi-Flight Search Comparison</h1>
+    <p class="text-center opacity-75 mb-8">Compare flights across multiple routes simultaneously</p>
+
+    <%= form_tag concurrent_search_flights_path, method: :post, data: { turbo: true } do %>
+      <div class="flight-search-grid">
+        <% 5.times do |i| %>
+          <div class="flight-search-box bg-white p-6 rounded-lg shadow-sm">
+            <h3 class="font-medium text-lg mb-4">Flight <%= i+1 %></h3>
+            
+            <div class="space-y-4">
+              <div class="form-group">
+                <%= label_tag "origins_#{i}", "Origin Airport", class: "block mb-1 text-sm font-medium" %>
+                <%= text_field_tag "origins[]", params[:origins]&.[](i), 
+                      class: "form-input w-full",
+                      placeholder: "e.g. JFK, LHR, NBO",
+                      required: i == 0 %>
+              </div>
+
+              <div class="form-group">
+                <%= label_tag "destinations_#{i}", "Destination Airport", class: "block mb-1 text-sm font-medium" %>
+                <%= text_field_tag "destinations[]", params[:destinations]&.[](i),
+                      class: "form-input w-full",
+                      placeholder: "e.g. LAX, CDG, MBA",
+                      required: i == 0 %>
+              </div>
+
+              <div class="form-group">
+                <%= label_tag "dates_#{i}", "Departure Date", class: "block mb-1 text-sm font-medium" %>
+                <%= date_field_tag "dates[]", params[:dates]&.[](i) || Date.today,
+                      class: "form-input w-full",
+                      required: i == 0 %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="text-center mt-8">
+        <%= submit_tag "Compare Flights", 
+              class: "btn btn-primary px-8 py-3 text-lg",
+              data: { disable_with: "Searching..." } %>
+      </div>
+    <% end %>
+
+    <div id="results" class="mt-12 bg-white p-6 rounded-lg shadow-sm">
+      <h2 class="text-xl font-bold mb-4">Flight Comparison Results</h2>
+      <% if @results %>
+        <%= render partial: 'comparison_results', locals: { results: @results } %>
+      <% else %>
+        <div class="text-center py-8 text-gray-500">
+          <p>Enter flight details above to compare results</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

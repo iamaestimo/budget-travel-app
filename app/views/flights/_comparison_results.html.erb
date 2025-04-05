@@ -1,0 +1,30 @@
+<div class="comparison-results overflow-x-auto">
+  <% if results.any? %>
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>Route</th>
+          <th>Departure</th>
+          <th>Airline</th>
+          <th>Price</th>
+          <th>Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% results.each do |result| %>
+          <% if result[:flights] %>
+            <tr>
+              <td><%= result[:origin] %> → <%= result[:destination] %></td>
+              <td><%= DateTime.parse(result[:flights].dig("itineraries", 0, "segments", 0, "departure", "at")).strftime("%b %d, %H:%M") %></td>
+              <td><%= result[:flights].dig("validatingAirlineCodes", 0) %></td>
+              <td><%= number_to_currency(result[:flights].dig("price", "total"), unit: result[:flights].dig("price", "currency")) %></td>
+              <td><%= result[:flights].dig("itineraries", 0, "duration").gsub('PT', '').gsub('H', 'h ').gsub('M', 'm') %></td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <div class="alert alert-warning">No flight results found for the selected routes</div>
+  <% end %>
+</div>
