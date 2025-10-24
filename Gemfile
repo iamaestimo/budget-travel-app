@@ -66,4 +66,4 @@ end
 
 gem "http", "~> 5.2"
 
-gem "async-http", "~> 0.88.0"
+gem "async-http", "~> 0.92.1"
